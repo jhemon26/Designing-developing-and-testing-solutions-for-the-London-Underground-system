@@ -19,9 +19,10 @@ use the key as nodes and neighbours as the value.
                        7
 So here we store  dict { K:V} as {0 : [2,3], 2: [4,5]} and so on.
 WE, perform BFS search here and use QUEUE.
-we would have Root, visited, queue.
-Where, root is start node and visited will be a sete() to keep tract of seen nodes
-queue will be used to define the relationship and levels of BFS. 
+we will have visited, startnode, endNode, queuea, path construction and a parent to keep track
+of current node and their connection and the path between them.visited will be a sete{} to keep track
+ of seen nodes.
+queue will be used to define the relationship and levels of BFS and to pull and push and store. 
 """
 
 from collections import deque
