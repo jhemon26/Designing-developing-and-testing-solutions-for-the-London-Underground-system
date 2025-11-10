@@ -2,7 +2,7 @@
 # max_heap.py
 
 # Introduction to Algorithms, Fourth edition
-# Linda Xiao and Tom Cormen
+
 
 #########################################################################
 #                                                                       #
