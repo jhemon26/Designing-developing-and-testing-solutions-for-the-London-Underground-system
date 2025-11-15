@@ -1,8 +1,6 @@
-#Oluwakemi Adekanbi
-#ID : 001431423
-#Task 4 A - Finding the minimum amount of open stations across an artificial network (U, V, W, X, Y, Z)
+#Task 4 A - Finding the minimum amount of open stations required across an artificial network (U, V, W, X, Y, Z)
 
-#Expected outcome: UV-1 VW-4 VX-2 XZ-3 YZ-2
+#Expected outcome: UV -> VW -> VX -> XZ -> YZ
 
 from adjacency_list_graph import AdjacencyListGraph
 from mst import kruskal
@@ -21,16 +19,15 @@ station_array_edges = [
 station_graph = AdjacencyListGraph(6, False, True)
 
 for x,y,z in station_array_edges:
-    station_graph.insert_edge(labels.index(x),labels.index(y), z)   #This adds the vertices of the edge and the weight to the graph
+    station_graph.insert_edge(labels.index(x),labels.index(y), z)   # This adds the vertices of the edge and the weight to the graph
 
-station_kruksal = kruskal(station_graph) # this finds the minimum spanning tree of a graph
+station_kruksal = kruskal(station_graph) # This finds the minimum spanning tree of a graph
 
-mst_graph = station_kruksal.get_edge_list() # an edge list of all the minimum edges needed (without the weights)
+mst_graph = station_kruksal.get_edge_list() # An edge list of all the minimum edges needed (without the weights)
 
 for x in range(len(mst_graph)):
-    u, v = mst_graph[x][0], mst_graph[x][1] # changes the vertices from integers to the string labels (station name)
+    u, v = mst_graph[x][0], mst_graph[x][1] # Changes the vertices from integers to the string labels (station name)
     mst_graph[x] = (labels[u], labels[v])
-
 
 print(mst_graph)
 
