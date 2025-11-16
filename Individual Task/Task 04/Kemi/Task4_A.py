@@ -1,10 +1,19 @@
 #Task 4 A - Finding the minimum amount of open stations required across an artificial network (U, V, W, X, Y, Z)
 
+#Network graph
+#          U(0)
+#         / \
+#     (1)V - W(4)
+#        | /  \
+#    (2) X (4) Y(5)
+#          \  /
+#        (3) Z (2)
+
 #Expected outcome: UV -> VW -> VX -> XZ -> YZ
 
 from adjacency_list_graph import AdjacencyListGraph
 from mst import kruskal
-# from print_path import print_path
+
 
 labels = ['U','V','W','X','Y','Z'] #names of the vertices
 
@@ -29,6 +38,6 @@ for x in range(len(mst_graph)):
     u, v = mst_graph[x][0], mst_graph[x][1] # Changes the vertices from integers to the string labels (station name)
     mst_graph[x] = (labels[u], labels[v])
 
-print(mst_graph)
+print(f"Backbone Connections:\n{mst_graph}")
 
 
