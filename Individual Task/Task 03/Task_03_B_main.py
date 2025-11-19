@@ -4,7 +4,8 @@
                                                                                                  
 # Project    : Designing and Devoloping London Underorund Trains Map and Operations.             
 # Task 3     : Journey Planner Based on Number of Stops                                          
-# SubTask 3A : Empirical Performance Measurement
+# SubTask 3A : Empirical Performance Measurement and Artificial BFS Timing
+
 
 from adjacency_list_graph import AdjacencyListGraph   # Graph data structure (For Adjacency List)
 from bfs import bfs                                   # BFS algorithm (For fewest stops search)
@@ -13,6 +14,10 @@ from print_path import print_path                     # For path reconstruction 
 import csv             # CSV for Underground data file reading
 import time            # Time for Exucution time measurement
 import random          # Random for randomly selecting stations for performance evaluation
+import matplotlib.pyplot as plt    # at the very top of your file
+
+artificial_results = []            # To store Artificial BFS timing results
+empirical_results =  []            # To store Empirical BFS timing results
 
 
 
@@ -49,11 +54,36 @@ def build_graph_from_csv(csv_filename):
     # Insert each edge into graph, avoiding duplicates
     seen = set()                   
     for u, v in edge_list:                               # Loop through all edges
-        if (u, v) not in seen and (v, u) not in seen:    # check for duplicates in undirected graph
+        if (u, v) not in seen and (v, u) not in seen:    # Check for duplicates in undirected graph
             G.insert_edge(u, v)                          # Insert edge into graph
             seen.add((u, v))                             # We mark this edge as seen
 
     return G, station_to_index, index_to_station         # Return graph plus station lookup tables
+
+
+# Method that performs artificial timing tests of BFS on randomly generated graphs
+def artificial_test():
+    print("\n===== Artificial BFS Timing Results =====")
+    for n in [100, 200, 400, 600, 800, 1000, 2000, 3000, 4000, 5000]:         # Different network sizes
+        G = AdjacencyListGraph(n, directed=False)     # Create empty undirected graph with n nodes
+
+        for i in range(n):
+            for _ in range(3):                        # Each node connects to 3 random other nodes
+                j = random.randint(0, n - 1)
+                if j != i and not G.has_edge(i, j):   # Avoid self-loops and duplicate edges
+                    G.insert_edge(i, j)
+
+        total = 0
+        for _ in range(20):
+            s1, s2 = random.sample(range(n), 2)      # Randomly select two different nodes
+            t0 = time.time()
+            bfs(G, s1)
+            total += time.time() - t0                # Accumulate BFS time
+
+        avg_time = total / 20
+        print(f"n={n} → avg BFS time = {avg_time:.6f} sec")
+
+        artificial_results.append((n, avg_time))   # We store results for plotting later
 
 
 
@@ -80,7 +110,6 @@ def find_stops(G, station_to_index, index_to_station, start_name, end_name):
 def empirical_test(G, station_to_index, index_to_station):
 
     stations = list(station_to_index.keys())  # Get full list of station names
-
     print("\n===== Empirical BFS Timing Results =====")
 
     for n in [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]:
@@ -88,23 +117,42 @@ def empirical_test(G, station_to_index, index_to_station):
             break
 
         total_time = 0
-        for _ in range(20):                          # repeat() times to make result accurate
-            s1, s2 = random.sample(stations[:n], 2)  # randomly select two different stations from first n stations
+        for _ in range(20):                          # Repeat() times to make result accurate
+            s1, s2 = random.sample(stations[:n], 2)  # Randomly select two different stations from first n stations 
+            start_idx = station_to_index[s1]         # Convert start station to index
+            t0 = time.time()
+            bfs(G, start_idx)                        # We run BFS
+            total_time += (time.time() - t0)
 
-            start_time = time.time()
-            find_stops(G, station_to_index, index_to_station, s1, s2)
-            total_time += (time.time() - start_time)
-
-        avg_time = total_time / 50
+        avg_time = total_time / 20                   # Avarage times per BFS
         print(f"Network size n = {n} → Average BFS time: {avg_time:.6f} seconds")
+        
+
+
+# Method to plot Artificial results
+def plot_artificial_results():                                    
+    if not artificial_results:
+        print("No empirical results to plot.")
+        return
+
+    ns = [x[0] for x in artificial_results]           # Extract network sizes
+    times = [x[1] for x in artificial_results]        # Extract times
+    plt.plot(ns, times, marker="o")                  # Plot with circle markers
+    plt.xlabel("Network Size (n)")
+    plt.ylabel("Average BFS Time (seconds)")
+    plt.title("BFS Performance on London Underground Network")
+    plt.grid(True)
+    plt.show()
 
 csv_file = "Individual Task/Task 03/underground_edges.csv"
 # Build full underground graph from CSV file
 G, station_to_index, index_to_station = build_graph_from_csv(csv_file)
-
 # Example test cases
 find_stops(G, station_to_index, index_to_station, "Covent Garden", "Leicester Square")
 find_stops(G, station_to_index, index_to_station, "Wimbledon", "Stratford")
 
-# Check BFS Performance times empirically
-empirical_test(G, station_to_index, index_to_station)
+artificial_test()  # To check the Artificial network timing 
+empirical_test(G, station_to_index, index_to_station)  # Check BFS Performance times empirically
+plot_artificial_results()  # Plot the Artificial Graph
+
+#For upload 
